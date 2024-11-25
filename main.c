@@ -99,15 +99,12 @@ void *resolve_address(MemoryManager *manager, int segment_index, size_t offset) 
         entry->valid = 1;
     }
 
-    printf("| Page Id | Physical frame | Offset |\n", page_index, entry->page_number, page_offset);
     printf("| %4zu    | %8u       | %4zu   |\n", page_index, entry->page_number, page_offset);
 
     return manager->physical_memory + (entry->page_number * PAGE_SIZE) + page_offset;
 }
 
 void write_memory(MemoryManager *manager, int segment_index, void *data, size_t size, size_t offset) {
-    printf("\033[5;33mWriting\033[0m\n");
-    printf("_____________________________________\n");
     Segment *segment = manager->segments[segment_index];
     if (segment == NULL) {
         printf("Error: Segment not found!\n");
@@ -158,8 +155,6 @@ void free_page(MemoryManager *manager, int segment_index, size_t offset) {
 }
 
 void read_memory(MemoryManager *manager, int segment_index, void *buffer, size_t size, size_t offset) {
-    printf("\033[5;32mReading\033[0m\n");
-    printf("_____________________________________\n");
     Segment *segment = manager->segments[segment_index];
     size_t page_index = offset / PAGE_SIZE;
     PageTableEntry *entry = &segment->page_table[page_index];
@@ -206,33 +201,54 @@ int main() {
     printf("================Char=================\n");
     char data_char[] = "Hello, Memory!";
     printf("Input:%s\n", data_char);
+    printf("\033[5;33mWriting\033[0m\n");
+    printf("_____________________________________\n");
+    printf("| Page Id | Physical frame | Offset |\n");
     write_memory(manager, segment_index, data_char, sizeof(data_char) - 1, 0);
     char buffer_char[50];
+    printf("\033[5;32mReading\033[0m\n");
+    printf("_____________________________________\n");
+    printf("| Page Id | Physical frame | Offset |\n");
     read_memory(manager, segment_index, buffer_char, sizeof(data_char) - 1, 0);
-    printf("Output:%s\n", buffer_char);
+    printf("\033[3;36mOutput: \033[0m%s\n", buffer_char);
 
     printf("=================INT=================\n");
     int data_int = 12345;
     printf("Input:%d\n", data_int);
+    printf("\033[5;33mWriting\033[0m\n");
+    printf("_____________________________________\n");
+    printf("| Page Id | Physical frame | Offset |\n");
     write_memory(manager, segment_index, &data_int, sizeof(data_int), 100);
     int buffer_int;
+    printf("\033[5;32mReading\033[0m\n");
+    printf("_____________________________________\n");
+    printf("| Page Id | Physical frame | Offset |\n");
     read_memory(manager, segment_index, &buffer_int, sizeof(data_int), 100);
-    printf("Output: %d\n", buffer_int);
+    printf("\033[3;36mOutput:\033[0m %d\n", buffer_int);
 
     printf("================Float================\n");
     float data_float = 3.14;
     printf("Input:%f\n", data_float);
+    printf("\033[5;33mWriting\033[0m\n");
+    printf("_____________________________________\n");
+    printf("| Page Id | Physical frame | Offset |\n");
     write_memory(manager, segment_index, &data_float, sizeof(data_float), 200);
     float buffer_float;
+    printf("\033[5;32mReading\033[0m\n");
+    printf("_____________________________________\n");
+    printf("| Page Id | Physical frame | Offset |\n");
     read_memory(manager, segment_index, &buffer_float, sizeof(data_float), 200);
-    printf("Output: %f\n", buffer_float);
+    printf("\033[3;36mOutput:\033[0m %f\n", buffer_float);
 
     printf("\033[5;31mRemoving page\033[0m\n");
     free_page(manager, segment_index, 200);
     buffer_float = 0.0;
     printf("Input:%f\n", data_float);
+    printf("\033[5;32mReading\033[0m\n");
+    printf("_____________________________________\n");
+    printf("| Page Id | Physical frame | Offset |\n");
     read_memory(manager, segment_index, &buffer_float, sizeof(data_float), 200);
-    printf("Output: %f\n", buffer_float);
+    printf("\033[3;36mOutput:\033[0m %f\n", buffer_float);
 
     free_segment(manager, segment_index);
     free(manager->physical_memory);
